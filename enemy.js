@@ -18,7 +18,7 @@ function Enemy( x, y )
 		decidingWhatToDo:21,
 		dying			:25
 	};
-	this.draw = function( context, grid, color, dyingColor )
+	this.draw = function( context, grid, aliveColor, dyingColor )
 	{
 		if( this.isAlive == false )
 			return;
@@ -26,9 +26,9 @@ function Enemy( x, y )
 		if( this.isFlashing == true )
 		{
 			if( this.shouldShow == 1 )
-				grid.drawMyPosition( context, this.position, color );
+				grid.drawMyPosition( context, this.position, aliveColor );
 			else
-				grid.drawMyPosition( context, this.position, color );
+				grid.drawMyPosition( context, this.position, dyingColor );
 		}
 		else
 		{
@@ -57,23 +57,30 @@ function Enemy( x, y )
 	};
 };
 
-function EnemyManager( width, height, minDistance, avoidedLocations, numToPlace )
+function EnemyManager( width, height, minDistance, walls, numToPlace )
 {
 	enemies = [];
 	
 	this.draw = function( context, grid )
 	{
-		var color = "DodgerBlue";
-		var num = walls.length;
+		var aliveColor = "OrangeRed";
+		var dyingColor = "SaddleBrown";
+		var num = enemies.length;
 		for( var i=0; i<num; i++ )
 		{
-			var pt = walls[i];
-			grid.drawMyPosition( context, pt, color );
+			var enemy = enemies[i];
+			enemy.draw( context, grid, aliveColor, dyingColor )
 		}
 	};
 	
-	this.update = function()
+	this.update = function( wallManager, blockManager )
 	{
+		var num = enemies.length;
+		for( var i=0; i<num; i++ )
+		{
+			var enemy = enemies[i];
+			grid.drawMyPosition( context, pt, color );
+		}
 	};
 
 	this.isWallPresent = function( pt ) 
