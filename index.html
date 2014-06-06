@@ -1,0 +1,302 @@
+<!doctype html>
+<head>
+	<title>Gamelogic Test V 1.08b</title>
+	
+	<script src="jsCommon/Utils.js"></script>
+	<script src="jsCommon/jquery.js"></script>
+	<script src="jsCommon/jquery-ui.min.js"></script>
+	<script src="jsCommon/Struct.js"></script>
+	<script src="jsCommon/jquery.easing.js"></script>
+	
+	<script src="drawing_routines.js"></script>
+	<script src="player.js"></script>
+	<script src="grid.js"></script>
+	<script src="mine.js"></script>
+	<script src="wall_manager.js"></script>
+	<script src="block_manager.js"></script>
+
+	
+	<!-- font loading -->
+	<link href='http://fonts.googleapis.com/css?family=Nunito|Inconsolata|Lobster+Two' rel='stylesheet' type='text/css'>
+	<link rel="shortcut icon" href="bunny.png">
+</head>
+<script>
+	
+	var context;
+	var grid;
+	var game;
+	var player;
+	var beginTime;
+	var mineField;
+	var wallManager;
+	var blockManager;
+	
+	///////////////////////////////////////////////////////
+	
+	function init()
+	{	
+		var canvas = document.getElementById('canvas');
+		context = canvas.getContext('2d');
+		
+		var renderBlockSize = 16;
+		var renderGridLineWidth = 2;
+		var gridSize = (renderBlockSize+renderGridLineWidth);
+		var blockAcross = 64;
+		var blocksDown = 64;
+		var visibleBlockAcross = 32;
+		var visibleblocksDown = 18;
+		canvas.width = visibleBlockAcross*gridSize, canvas.height = visibleblocksDown*gridSize;
+		
+		document.addEventListener('mousemove', mousemoveEvent, false);
+		canvas.addEventListener('mouseup', mouseUp, false);
+		document.addEventListener('mousedown', mouseDown, false);
+		
+		document.addEventListener('keydown', keyDownEvent, false);
+		document.addEventListener("keyup", keyUpEvent, false);	
+		setupBrowserFrameRateMaximum( update )
+		
+		//----------------------------------------------
+		
+		//alert( "pause");
+		grid = new Grid( renderBlockSize, renderGridLineWidth, visibleBlockAcross, visibleblocksDown, blockAcross, blocksDown );
+		player = new Player();
+		beginTime = new Date().getTime();
+		mineField = new MineField();
+		wallManager = new WallManager( blockAcross, blocksDown, 4, undefined, 32 );
+		blockManager = new BlockManager( blockAcross, blocksDown, 4, 0, 0 );
+	};
+	
+	///////////////////////////////////////////////////////
+	function update()
+	{
+		if( beginTime === undefined )
+			return;
+		if( player === undefined )
+			return;
+	
+		var currentTime = new Date().getTime();
+		var timeElapsed = currentTime - beginTime;
+		beginTime = currentTime;
+		
+		context.clearRect( 0, 0, canvas.width, canvas.height ); // why I have to do this... arghh
+
+		
+		// order of drawing matters
+		
+		if( grid )
+		{
+			grid.draw( context );
+		}
+		if( blockManager )
+		{
+			blockManager.draw( context, grid );
+		}
+		if( mineField )
+		{
+			mineField.draw( context, grid );
+		}
+		if( wallManager )
+		{
+			wallManager.draw( context, grid );
+		}		
+		if( player )
+		{
+			player.draw( context, grid );
+		}
+		
+		
+		//drawGrid();
+		
+		//-------------------------
+		player.update( grid, undefined, wallManager, blockManager );
+
+		wallManager.update();
+
+		mineField.update();
+		
+		blockManager.update();
+
+	}
+	///////////////////////////////////////////////////////
+
+	function calculateMousePosition( event )
+	{
+		var x, y;
+
+		// Get the mouse position relative to the canvas element.
+		if (event.layerX || event.layerX == 0) 
+		{ // Firefox
+			x = event.layerX;
+			y = event.layerY;
+			} else if (event.offsetX || event.offsetX == 0) { // Opera
+			x = event.offsetX;
+			y = event.offsetY;
+		}
+		return {x:x, y:y};
+	};
+	function mousemoveEvent (event) 
+	{
+		
+	};
+	
+	function mouseDown( event ) 
+	{
+		//framework.processEvent( event, framework.eventType.mouseDown );
+	};
+	
+	function mouseUp( event )
+	{
+		var canvas = $("#canvas")[0];
+		var offset = $("#canvas").offset();
+		//framework.processEvent( event, framework.eventType.mouseUp );
+		var pt = calculateMousePosition( event );//{ x:event.clientX - offset.left, y:event.clientY - offset.top };
+		console.log( "mouse: {x:" + pt.x + ", y:" + pt.y + ", w:" + canvas.width + ", h:" + canvas.height +"}" );
+		var gridPosition = grid.calculatePosition( pt );
+		player.moveTo( gridPosition );
+	};
+	
+	function keyDownEvent( event )
+	{
+		var keyCode = event.keyCode;
+		if( player )
+		{
+			if( keyCode == 38 )// up arrow
+			{
+				player.move( 0, -1, grid, wallManager, blockManager );
+				return true;
+			}
+			if( keyCode == 40 )// down arrow
+			{
+				player.move( 0, 1, grid, wallManager, blockManager );
+				return true;
+			}
+			if( keyCode == 39 )// right arrow
+			{
+				player.move( 1, 0, grid, wallManager, blockManager );
+				return true;
+			}
+			if( keyCode == 37 )// left arrow
+			{
+				player.move( -1, 0, grid, wallManager, blockManager );
+				return true;
+			}
+			if( keyCode == 32 )// space
+			{
+				player.placeMine( mineField );
+				return true;
+			}
+		}
+		//framework.processEvent( event, framework.eventType.keyDown );
+	};
+	function keyUpEvent( event )
+	{
+		//framework.processEvent( event, framework.eventType.keyUp );
+	};
+	///////////////////////////////////////////////////////
+</script>
+<style>
+	#canvas
+	{
+		background-color: white;
+		//margin-left: auto;
+		//margin-right: auto;
+		//width: 612px;
+		//height: 288px;
+		margin: 20px;
+		
+	}
+	#container 
+	{
+		background: DarkCyan;
+		//width: 512px;
+		//height: 700px;
+		
+		border: 2px solid #333;
+		border-radius:25px;
+		box-shadow: 0px 0px 5px 5px DarkCyan ;
+		margin-left: auto;
+		margin-right: auto;
+		position: relative;
+		//top: 50%;
+		transform: translateY(-50%);
+		display: inline-block;
+		margin-top: 50px;
+	}
+	#canvas_background
+	{
+		background: #f00;
+		
+	}
+	body
+	{
+		background: #000;
+		font-family:'Nunito';
+		font-size: 20px;
+		text-align: center;
+		
+	}
+	canvas
+	{
+		border: 2px solid #333;
+		border-radius: 3px;
+	}
+	aside
+	{
+		
+	}
+	.basic_text
+	{
+		position: absolute;
+		z-index: 100;
+		font-family:'Nunito';
+		font-size: 16px;
+		color: white;
+		left: 30px;
+		top: -14px;
+	}
+	#score
+	{
+		left: 30px;
+	}
+	#lives
+	{
+		left: 210px;
+	}
+	#blocks
+	{
+		left: 420px;
+	}
+</style>
+
+<body onload="init();">
+	<div id="container">
+		<aside>
+			<h2 id="score" class="basic_text"> score: 0 </h2>
+			<h2 id="lives" class="basic_text"> lives: 3 </h2>
+			<h2 id="blocks" class="basic_text"> blocks: 3 </h2>
+		</aside>
+		<canvas id='canvas'></canvas>
+	</div>
+	
+</body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
