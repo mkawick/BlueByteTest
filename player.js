@@ -14,33 +14,14 @@ function Player()
 	this.isDead = false;
 	this.score = 100;
 	this.blocks = 10;
-/*	this.entityStates = 
-	{
-		none			:0, 
-		walking			:1, 
-		running			:2, 
-		jumping			:3, 
-		stopping		:4,
-		targeting		:5,
-		shooting		:6,
-		attacking		:7,
-		falling			:8,
-		climbing		:9,
-		decidingWhatToDo:21,
-		dying			:25
-	};*/
+
 	this.movementStates = 
 	{
 		none			:0, 
-		walking			:1, 
-		running			:2, 
-		jumping			:3, 
-		stopping		:4,
-		falling			:5,
-		climbing		:6
+		walking			:1
 	};
 	this.currentMovementState = this.movementStates.none;
-	this.getNextValidMovementLocation = function( wallManager, grid, currentPosition, finalDestination )
+/*	this.getNextValidMovementLocation = function( wallManager, grid, currentPosition, finalDestination )
 	{
 		var positionsToTest = // moving in a circle
 		[
@@ -81,7 +62,7 @@ function Player()
 		if( smallestValueIndex == -1 )
 			return undefined;
 		return positionsToTest[ smallestValueIndex ];
-	};
+	};*/
 	
 	this.draw = function( context, grid )
 	{
@@ -114,7 +95,7 @@ function Player()
 		{
 			var isStuck = false;
 			
-			var offset = this.getNextValidMovementLocation( wallManager, grid, this.position, this.finalDestination );
+			var offset = getNextValidMovementLocation( wallManager, grid, this.position, this.finalDestination );
 			if( offset == undefined )
 			{
 				isStuck = true;

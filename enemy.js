@@ -1,8 +1,65 @@
-// wall_manager.js
+// enemy.js
 
-function WallManager( width, height, minDistance, avoidedLocations, numToPlace )
+function Enemy( x, y )
 {
-	walls = [];
+	this.position = new Point( x, y );
+
+	this.flashTimeLength = 2000;
+	this.beginLifeTime = new Date().getTime();
+	this.isFlashing = false;
+	this.shoudShow = true;
+	this.isAlive = true;
+	this.entityStates = 
+	{
+		none			:0, 
+		walking			:1, 
+		resting			:2, 
+		chasing			:3, 
+		decidingWhatToDo:21,
+		dying			:25
+	};
+	this.draw = function( context, grid, color, dyingColor )
+	{
+		if( this.isAlive == false )
+			return;
+			
+		if( this.isFlashing == true )
+		{
+			if( this.shouldShow == 1 )
+				grid.drawMyPosition( context, this.position, color );
+			else
+				grid.drawMyPosition( context, this.position, color );
+		}
+		else
+		{
+			grid.drawMyPosition( context, this.position, dyingColor );
+		}
+	};
+	this.update = function( player, wallManager, blockManager, currentTime )
+	{
+		/*if( this.doesExpire == true )
+		{
+			if( currentTime - this.beginLifeTime > this.lifetimeLength )
+			{
+				this.isFlashing = true;
+			}
+			if( currentTime - this.beginLifeTime > this.lifetimeLength + this.flashTimeLength )
+			{
+				this.isAlive = false;
+			}
+			if( this.isFlashing == true && this.isAlive == true )
+			{
+				var numFlashesBeforeDeath = 10;
+				var lengthOfFlash = this.flashTimeLength / numFlashesBeforeDeath;
+				this.shouldShow = parseInt( ( ( currentTime - this.beginLifeTime ) - this.lifetimeLength ) / lengthOfFlash ) % 2;
+			}
+		}*/
+	};
+};
+
+function EnemyManager( width, height, minDistance, avoidedLocations, numToPlace )
+{
+	enemies = [];
 	
 	this.draw = function( context, grid )
 	{

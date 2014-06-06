@@ -14,6 +14,8 @@
 	<script src="mine.js"></script>
 	<script src="wall_manager.js"></script>
 	<script src="block_manager.js"></script>
+	<script src="a-star.js"></script>
+	<script src="enemy.js"></script>
 
 	
 	<!-- font loading -->
@@ -62,7 +64,7 @@
 		player = new Player();
 		beginTime = new Date().getTime();
 		mineField = new MineField();
-		wallManager = new WallManager( blockAcross, blocksDown, 4, undefined, 32 );
+		wallManager = new WallManager( blockAcross, blocksDown, 4, [player.position], 32 );
 		blockManager = new BlockManager( blockAcross, blocksDown, 4, 0, 0 );
 	};
 	
