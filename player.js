@@ -12,8 +12,8 @@ function Player()
 	
 	this.health = 3;
 	this.isDead = false;
-	this.score = 100;
-	this.blocks = 10;
+	this.score = 0;
+	this.mines = 10;
 
 	this.movementStates = 
 	{
@@ -34,10 +34,10 @@ function Player()
 		{
 			score.innerHTML = "score: " + this.score;
 		}
-		var blocks = document.getElementById( "blocks" );
-		if( blocks )
+		var mines = document.getElementById( "blocks" );
+		if( mines )
 		{
-			blocks.innerHTML = "blocks: " + this.blocks;
+			mines.innerHTML = "mines: " + this.mines;
 		}
 		
 		grid.drawMyPosition( context, this.position, "#0f0" );
@@ -86,18 +86,19 @@ function Player()
 		if( blockManager.isBlockPresent( this.position ) == true )
 		{
 			blockManager.removeBlock( this.position );
-			this.blocks ++;
+			this.mines ++;
 		}
 	};
 	
 	this.placeMine = function( mineField )
 	{
-		if( this.blocks === 0 )
+		if( this.mines === 0 )
 			return;
-		this.blocks--;
 		
 		if( mineField.isMinePresent( this.position ) == true )
 			return;
+			
+		this.mines--;
 		mineField.placeMine( this.position );
 	};
 	

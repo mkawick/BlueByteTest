@@ -32,6 +32,8 @@ function WallManager( width, height, minDistance, avoidedLocations, numToPlace )
 		return false;
 	};
 	
+	this.getWalls = function() { return walls.slice(0);}
+	
 	findMinDistance = function( pt, listOfPoints )
 	{
 		if( listOfPoints.length == 0 )

@@ -32,6 +32,7 @@
 	var mineField;
 	var wallManager;
 	var blockManager;
+	var enemyManager;
 	
 	///////////////////////////////////////////////////////
 	
@@ -47,6 +48,7 @@
 		var blocksDown = 64;
 		var visibleBlockAcross = 32;
 		var visibleblocksDown = 18;
+		var numEnemies = 10;
 		canvas.width = visibleBlockAcross*gridSize, canvas.height = visibleblocksDown*gridSize;
 		
 		document.addEventListener('mousemove', mousemoveEvent, false);
@@ -66,6 +68,7 @@
 		mineField = new MineField();
 		wallManager = new WallManager( blockAcross, blocksDown, 4, [player.position], 32 );
 		blockManager = new BlockManager( blockAcross, blocksDown, 4, 0, 0 );
+		enemyManager = new EnemyManager( blockAcross, blocksDown, 4, wallManager, numEnemies );
 	};
 	
 	///////////////////////////////////////////////////////
@@ -106,6 +109,11 @@
 			player.draw( context, grid );
 		}
 		
+		if( enemyManager )
+		{
+			enemyManager.draw( context, grid );
+		}
+		
 		
 		//drawGrid();
 		
@@ -118,6 +126,7 @@
 		
 		blockManager.update();
 
+		enemyManager.update( wallManager, blockManager, player, grid, currentTime );
 	}
 	///////////////////////////////////////////////////////
 
